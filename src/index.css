@@ -1,0 +1,141 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    @apply bg-ink-950 text-slate-300 font-sans antialiased;
+    background-image:
+      radial-gradient(60rem 60rem at 80% -10%, rgba(58, 85, 245, 0.08), transparent),
+      radial-gradient(50rem 50rem at -10% 20%, rgba(168, 85, 247, 0.06), transparent);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    @apply bg-brand-500/40 text-white;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-white font-semibold tracking-tight;
+    text-wrap: balance;
+  }
+}
+
+@layer components {
+  /* Slim, themed scrollbars */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: theme("colors.ink.600") transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-ink-600 rounded-full;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-700;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Glass panel used across cards and figures */
+  .glass {
+    @apply bg-ink-850/70 border border-white/5 backdrop-blur-sm;
+  }
+
+  .card-glow {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 20px 60px -30px rgba(58, 85, 245, 0.5);
+  }
+
+  /* Link style inside prose */
+  .prose-link {
+    @apply text-brand-300 underline decoration-brand-500/40 underline-offset-2 hover:decoration-brand-400 transition-colors;
+  }
+}
+
+/* ---- Long-form reading typography ("chapter prose") ---- */
+.chapter-prose {
+  @apply text-[1.02rem] leading-[1.85] text-slate-300/95;
+}
+.chapter-prose > p {
+  @apply my-5;
+}
+.chapter-prose h2 {
+  @apply text-2xl md:text-3xl mt-14 mb-5 scroll-mt-28 flex items-center gap-3;
+}
+.chapter-prose h3 {
+  @apply text-xl md:text-2xl mt-10 mb-4 scroll-mt-28 text-slate-100;
+}
+.chapter-prose h4 {
+  @apply text-lg mt-8 mb-3 text-slate-100;
+}
+.chapter-prose ul {
+  @apply my-5 space-y-2 pl-1;
+}
+.chapter-prose ul > li {
+  @apply relative pl-6;
+}
+.chapter-prose ul > li::before {
+  content: "";
+  @apply absolute left-1 top-[0.7em] h-1.5 w-1.5 rounded-full bg-brand-400;
+}
+.chapter-prose ol {
+  @apply my-5 space-y-2 pl-6 list-decimal marker:text-brand-300;
+}
+.chapter-prose ol > li {
+  @apply pl-1;
+}
+.chapter-prose strong {
+  @apply text-white font-semibold;
+}
+.chapter-prose em {
+  @apply text-slate-200 italic;
+}
+.chapter-prose a {
+  @apply prose-link;
+}
+.chapter-prose blockquote {
+  @apply border-l-2 border-brand-500/50 pl-4 my-6 text-slate-400 italic;
+}
+.chapter-prose code:not(pre code) {
+  @apply font-mono text-[0.86em] text-accent-cyan bg-ink-800/80 border border-white/5 rounded px-1.5 py-0.5;
+}
+.chapter-prose table {
+  @apply w-full my-6 text-sm border-collapse;
+}
+.chapter-prose th {
+  @apply text-left font-semibold text-slate-200 border-b border-white/10 px-3 py-2 bg-ink-800/50;
+}
+.chapter-prose td {
+  @apply border-b border-white/5 px-3 py-2 align-top;
+}
+.chapter-prose hr {
+  @apply my-10 border-white/10;
+}
+
+/* KaTeX sizing inside prose */
+.katex {
+  font-size: 1.05em;
+}
+.katex-display {
+  @apply my-6 overflow-x-auto overflow-y-hidden py-2 scrollbar-thin;
+}
