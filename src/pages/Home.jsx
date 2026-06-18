@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { parts, allChapters, totalMinutes, chapterCount } from "../data/chapters";
 import LifecyclePipeline from "../components/viz/LifecyclePipeline";
+import WaitlistCTA from "../components/WaitlistCTA";
 
 const ACCENT = {
   cyan: { text: "text-accent-cyan", ring: "hover:border-accent-cyan/50", dot: "bg-accent-cyan" },
@@ -172,10 +173,12 @@ export default function Home() {
         </div>
       </section>
 
+      <WaitlistCTA />
+
       <footer className="mx-auto mt-24 max-w-3xl border-t border-white/5 pt-8 text-center text-sm text-slate-600">
         <p>
-          Built as an open educational resource — the “bible” of how modern language models are
-          made. Start at{" "}
+          Built as an open educational resource — a complete school for how modern language models
+          are made. Start at{" "}
           <Link to={`/chapter/${allChapters[0].slug}`} className="prose-link">
             Chapter 1
           </Link>{" "}

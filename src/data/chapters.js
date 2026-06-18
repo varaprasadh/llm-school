@@ -1,5 +1,5 @@
 /**
- * The LLM Bible — chapter registry.
+ * The LLM School — chapter registry.
  *
  * This is the single source of truth for navigation, routing and ordering.
  * Each chapter has a component file at `src/chapters/<slug>.jsx` that

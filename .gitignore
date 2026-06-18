@@ -8,3 +8,8 @@ dist-ssr
 .idea
 *.log
 npm-debug.log*
+
+# Local env (Supabase keys). Keep .env.example committed.
+.env
+.env.*
+!.env.example

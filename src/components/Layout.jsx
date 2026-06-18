@@ -48,7 +48,7 @@ export default function Layout() {
           aria-label="Open navigation"
         >
           <span className="text-xl">☰</span>
-          <span className="font-semibold text-white">The LLM Bible</span>
+          <span className="font-semibold text-white">The LLM School</span>
         </button>
         <img src="/favicon.svg" alt="" className="h-7 w-7" />
       </header>
