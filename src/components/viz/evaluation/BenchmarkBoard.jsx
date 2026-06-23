@@ -328,6 +328,7 @@ function JudgePanel() {
     const win = winner === ans.id;
     return (
       <div
+        key={ans.id}
         className={`flex-1 rounded-xl border p-3 transition-colors ${
           win ? "border-amber-400/60 bg-amber-400/[0.06]" : "border-white/10 bg-ink-900/50"
         }`}

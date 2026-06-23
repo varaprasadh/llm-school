@@ -26,14 +26,24 @@ export default function ChapterPage() {
   const chapter = chapterBySlug[slug];
   const Comp = chapterComponents[slug];
   const contentRef = useRef(null);
+  const lastSigRef = useRef("");
   const [toc, setToc] = useState([]);
   const [activeId, setActiveId] = useState(null);
 
   // Build the table of contents from rendered headings; keep it in sync as the
   // lazy chapter content mounts (MutationObserver) and dedupe ids.
+  //
+  // The chapter body can be a very large subtree (math-heavy chapters render
+  // thousands of KaTeX nodes), and interactive visualizations mutate their own
+  // DOM on every slider tick. To keep that cheap we (1) coalesce mutation bursts
+  // into a single rebuild per animation frame, and (2) skip the state update
+  // entirely when the set of headings hasn't actually changed — so dragging a
+  // slider no longer forces a TOC re-render and IntersectionObserver rebuild.
   useEffect(() => {
     const el = contentRef.current;
     if (!el) return undefined;
+    lastSigRef.current = "";
+    let raf = 0;
     const build = () => {
       const heads = el.querySelectorAll("h2, h3");
       const seen = {};
@@ -50,12 +60,25 @@ export default function ChapterPage() {
           level: h.tagName === "H2" ? 2 : 3,
         });
       });
+      const sig = items.map((i) => `${i.level}|${i.id}|${i.text}`).join("§");
+      if (sig === lastSigRef.current) return; // headings unchanged — no churn
+      lastSigRef.current = sig;
       setToc(items);
     };
-    build();
-    const obs = new MutationObserver(build);
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        build();
+      });
+    };
+    build(); // initial pass, synchronous
+    const obs = new MutationObserver(schedule);
     obs.observe(el, { childList: true, subtree: true });
-    return () => obs.disconnect();
+    return () => {
+      obs.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [slug]);
 
   // Scroll-spy for the active TOC entry.

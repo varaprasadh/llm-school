@@ -308,7 +308,9 @@ function describeWedge(cx, cy, r, a0, a1) {
   const x1 = cx + r * Math.cos(a1);
   const y1 = cy - r * Math.sin(a1);
   let delta = a1 - a0;
-  // Normalize to (-π, π] for a clean minor-arc wedge.
+  // Normalize to (-π, π] for a clean minor-arc wedge. Guard against non-finite
+  // input (Infinity/NaN would make these loops spin forever).
+  if (!Number.isFinite(delta)) delta = 0;
   while (delta > Math.PI) delta -= 2 * Math.PI;
   while (delta <= -Math.PI) delta += 2 * Math.PI;
   const largeArc = Math.abs(delta) > Math.PI ? 1 : 0;
