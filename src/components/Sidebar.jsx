@@ -34,7 +34,7 @@ export default function Sidebar({ onNavigate }) {
       >
         <img src="/favicon.svg" alt="" className="h-9 w-9" />
         <div className="leading-tight">
-          <div className="font-semibold text-white">The LLM Bible</div>
+          <div className="font-semibold text-white">The LLM School</div>
           <div className="text-[11px] uppercase tracking-wider text-slate-500">
             Train & deploy from scratch
           </div>

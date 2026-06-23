@@ -1,9 +1,9 @@
 {
-  "name": "llm-bible",
+  "name": "llm-school",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "The LLM Bible — an end-to-end, visual guide to training and deploying a large language model from scratch.",
+  "description": "The LLM School — an end-to-end, visual guide to training and deploying a large language model from scratch.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

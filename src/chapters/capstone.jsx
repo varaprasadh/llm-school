@@ -513,7 +513,7 @@ curl http://localhost:8000/v1/chat/completions \\
       </Callout>
 
       <p className="text-slate-400">
-        Thank you for reading <em>The LLM Bible</em>. Now go predict some tokens. 🚀
+        Thank you for reading <em>The LLM School</em>. Now go predict some tokens. 🚀
       </p>
     </>
   );

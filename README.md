@@ -1,4 +1,4 @@
-# The LLM Bible 📖
+# The LLM School 📖
 
 > A complete, visual, end-to-end guide to **training and deploying a large language model from scratch** — every concept, every example, every visualization. Built as an open educational resource for the next generation of ML engineers.
 

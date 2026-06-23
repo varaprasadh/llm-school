@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-"The LLM Bible" — an interactive, visual textbook (React + Vite SPA) teaching how to train and deploy an LLM from scratch. 25 chapters across 6 parts, each with prose, runnable PyTorch examples, KaTeX math, and custom interactive visualizations. It is content-heavy and presentation-only: there is no backend, no data fetching, no auth.
+"The LLM School" — an interactive, visual textbook (React + Vite SPA) teaching how to train and deploy an LLM from scratch. 25 chapters across 6 parts, each with prose, runnable PyTorch examples, KaTeX math, and custom interactive visualizations. It is content-heavy and presentation-only: there is no backend, no data fetching, no auth.
 
 ## Commands
 
