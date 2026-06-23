@@ -1,4 +1,4 @@
-# Chapter Authoring Guide — The LLM Bible
+# Chapter Authoring Guide — The LLM School
 
 You are writing **one chapter** (or a small set) of an interactive, visual textbook on
 training and deploying LLMs from scratch. It is a React + Vite + Tailwind site. This guide is
