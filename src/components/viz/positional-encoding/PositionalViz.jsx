@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { SegmentedControl, Slider } from "../ui";
 import { heat } from "../scales";
 
@@ -63,16 +63,84 @@ export default function PositionalViz() {
 
 function SinusoidalView() {
   const [seqLen, setSeqLen] = useState(32);
-  const matrix = useMemo(() => sinusoidalPE(seqLen, D_MODEL), [seqLen]);
+  // The slider thumb/label stay fully responsive (urgent state), while the
+  // expensive heatmap (up to ~2000 SVG cells) re-renders from a deferred value.
+  // During a fast drag React can skip intermediate frames instead of rebuilding
+  // the whole grid on every tick — which is what made this chapter stutter.
+  const renderLen = useDeferredValue(seqLen);
+  const matrix = useMemo(() => sinusoidalPE(renderLen, D_MODEL), [renderLen]);
 
   // Draw as raw SVG so we control cell size for the (possibly tall) matrix.
   // Values are in [-1, 1]; map to the heat ramp via (v+1)/2.
   const cellW = 16;
-  const cellH = Math.max(7, Math.min(16, 380 / seqLen));
+  const cellH = Math.max(7, Math.min(16, 380 / renderLen));
   const gridW = D_MODEL * cellW;
-  const gridH = seqLen * cellH;
+  const gridH = renderLen * cellH;
   const padL = 44;
   const padT = 24;
+  const W = gridW + padL + 16;
+  const H = gridH + padT + 24;
+
+  const canvasRef = useRef(null);
+  const [hover, setHover] = useState(null); // {pos, dim, v} under the cursor
+
+  // Paint the heatmap (and its axis labels) onto a canvas. A dense grid as SVG
+  // would reconcile ~2000 nodes on every slider tick; on canvas it is a single
+  // cheap repaint with zero DOM nodes, so dragging stays smooth.
+  useEffect(() => {
+    const cv = canvasRef.current;
+    if (!cv) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = W * dpr;
+    cv.height = H * dpr;
+    const ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    for (let pos = 0; pos < matrix.length; pos++) {
+      const row = matrix[pos];
+      const y = padT + pos * cellH;
+      for (let i = 0; i < row.length; i++) {
+        ctx.fillStyle = heat((row[i] + 1) / 2);
+        ctx.fillRect(padL + i * cellW, y, cellW - 1, cellH - 1);
+      }
+    }
+
+    ctx.fillStyle = "#64748b";
+    ctx.font = "11px ui-sans-serif, system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(
+      `embedding dimension i (0 … ${D_MODEL - 1})  →  faster left, slower right`,
+      padL + gridW / 2,
+      12
+    );
+    ctx.save();
+    ctx.translate(12, padT + gridH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText("position pos", 0, 0);
+    ctx.restore();
+
+    ctx.fillStyle = "#475569";
+    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.textAlign = "right";
+    const every = Math.ceil(renderLen / 8);
+    for (let pos = 0; pos < matrix.length; pos++) {
+      if (pos % every === 0) ctx.fillText(String(pos), padL - 6, padT + pos * cellH + cellH * 0.8);
+    }
+  }, [matrix, cellH, gridH, gridW, W, H, renderLen]);
+
+  const onMove = (e) => {
+    const cv = canvasRef.current;
+    if (!cv) return;
+    const rect = cv.getBoundingClientRect();
+    const i = Math.floor((e.clientX - rect.left - padL) / cellW);
+    const pos = Math.floor((e.clientY - rect.top - padT) / cellH);
+    if (pos >= 0 && pos < matrix.length && i >= 0 && i < D_MODEL) {
+      setHover({ pos, dim: i, v: matrix[pos][i] });
+    } else if (hover) {
+      setHover(null);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -90,60 +158,17 @@ function SinusoidalView() {
       </div>
 
       <div className="overflow-x-auto scrollbar-thin">
-        <svg
-          width={gridW + padL + 16}
-          height={gridH + padT + 24}
+        <canvas
+          ref={canvasRef}
+          style={{ width: W, height: H }}
           className="block"
-        >
-          {/* column axis label */}
-          <text x={padL + gridW / 2} y={12} textAnchor="middle" fontSize="11" fill="#64748b">
-            embedding dimension i (0 … {D_MODEL - 1})  →  faster left, slower right
-          </text>
-          {/* row axis label */}
-          <text
-            x={12}
-            y={padT + gridH / 2}
-            textAnchor="middle"
-            fontSize="11"
-            fill="#64748b"
-            transform={`rotate(-90, 12, ${padT + gridH / 2})`}
-          >
-            position pos
-          </text>
+          onMouseMove={onMove}
+          onMouseLeave={() => setHover(null)}
+        />
+      </div>
 
-          {/* cells */}
-          {matrix.map((row, pos) =>
-            row.map((v, i) => (
-              <rect
-                key={`${pos}-${i}`}
-                x={padL + i * cellW}
-                y={padT + pos * cellH}
-                width={cellW - 1}
-                height={cellH - 1}
-                fill={heat((v + 1) / 2)}
-              >
-                <title>{`pos=${pos}, dim=${i}: ${v.toFixed(3)}`}</title>
-              </rect>
-            ))
-          )}
-
-          {/* a few position tick labels */}
-          {matrix.map((_, pos) =>
-            pos % Math.ceil(seqLen / 8) === 0 ? (
-              <text
-                key={pos}
-                x={padL - 6}
-                y={padT + pos * cellH + cellH * 0.8}
-                textAnchor="end"
-                fontSize="9"
-                fill="#475569"
-                fontFamily="JetBrains Mono, monospace"
-              >
-                {pos}
-              </text>
-            ) : null
-          )}
-        </svg>
+      <div className="h-4 font-mono text-[11px] text-slate-500">
+        {hover ? `pos=${hover.pos}, dim=${hover.dim}: ${hover.v.toFixed(3)}` : "Hover a cell to read its value."}
       </div>
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-slate-500">
